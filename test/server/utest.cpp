@@ -1,8 +1,9 @@
-#include "template.hpp"
+#include "server.hpp"
 #include <string>
 #include <iostream>
+#include "server.hpp"
 
 int main()
 {
-	std::cout<<"bla";
+	RemoteAIServer server{3000};
 }
