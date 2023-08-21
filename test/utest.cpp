@@ -4,5 +4,5 @@
 
 int main()
 {
-
+	std::cout<<"bla";
 }
