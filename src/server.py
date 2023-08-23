@@ -25,23 +25,22 @@ class SimpleServer:
 
         server_thread = threading.Thread(target=self._server_thread)
         server_thread.start()
-
+        
         server_thread.join()
         self.server_socket.close()
         
-    def _server_thread(self):
-        
-        while not self.terminate_server:
+    def _server_thread(self):     
+        while True:
             client_socket, client_address = self.server_socket.accept()
             print(f"Accepted connection from {client_address}")
             
-            frame_bytes = client_socket.recv(self.buffer_size)   
+            frame_bytes = client_socket.recv(self.buffer_size)
             frame = np.frombuffer(frame_bytes, dtype=np.uint8)
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             
             self.face_detector = FaceDetector(frame)
             image, roi = self.face_detector.detect_faces()
-            self.save_face_to_file(image)
+            # self.save_face_to_file(image)
             
             encoder = Encoder("test" , "local" , roi)
             response = encoder.encode()
@@ -50,6 +49,7 @@ class SimpleServer:
             
             client_socket.send(response.encode('utf-8'))
             client_socket.close()
+            break
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG
