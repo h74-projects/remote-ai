@@ -25,13 +25,3 @@ class ImageClient:
     def close_connection(self):
         if self.client_socket:
             self.client_socket.close()
-
-# if __name__ == "__main__":
-#     server_host = 'localhost'
-#     server_port = 8080
-#     image_path = 'face.jpg'  # Replace with the path to your image file
-
-#     client = ImageClient(server_host, server_port)
-#     client.connect_to_server()
-#     client.send_image(image_path)
-#     client.close_connection()

@@ -11,7 +11,7 @@ class Encoder:
         self.m_message = ''
 
     def encode(self):
-        self.m_message = f"{self.m_topic}|{self.m_time}|{self.m_source}|{self.m_face}"
+        self.m_message = f"{self.m_topic}|{self.m_time}|{self.m_source}|{self.m_face}|"
         return self.m_message
     
 # if __name__ == "__main__":
