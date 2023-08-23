@@ -1,4 +1,4 @@
-from ..src.server import SimpleServer
+from src.server import SimpleServer
 import sys
 
 if __name__ == "__main__":
