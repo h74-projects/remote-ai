@@ -14,6 +14,6 @@ class Encoder:
         self.m_message = f"{self.m_topic}|{self.m_time}|{self.m_source}|{self.m_face}"
         return self.m_message
     
-if __name__ == "__main__":
-    encoder_instance = Encoder("face", "nisan", [(295,199,137,137)])
-    print(encoder_instance.encode())
+# if __name__ == "__main__":
+#     encoder_instance = Encoder("face", "nisan", [(295,199,137,137)])
+#     print(encoder_instance.encode())
