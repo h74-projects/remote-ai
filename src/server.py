@@ -1,5 +1,9 @@
+from src.recognition_face import FaceDetector
+from src.encoder import Encoder
+import numpy as np
 import socket
 import threading
+import cv2
 import sys
 
 class SimpleServer:
@@ -7,8 +11,10 @@ class SimpleServer:
         self.host = host
         self.port = port
         self.server_socket = None
+        self.face_detector = None
         self.terminate_server = False
-
+        self.buffer_size = 128 * 1024
+        
     def start(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -20,35 +26,30 @@ class SimpleServer:
         server_thread = threading.Thread(target=self._server_thread)
         server_thread.start()
 
-        try:
-            while not self.terminate_server:
-                key_press = input("Press 'q' to quit: ")
-                if key_press == 'q':
-                    self.terminate_server = True
-                    break
-        except KeyboardInterrupt:
-            pass
-        
         server_thread.join()
         self.server_socket.close()
+        
     def _server_thread(self):
+        
         while not self.terminate_server:
-            try:
-                client_socket, client_address = self.server_socket.accept()
-                print(f"Accepted connection from {client_address}")
-
-                data = client_socket.recv(1024)
-                
-                if self.is_image(data):
-                    response = "You sent an image."
-                else:
-                    response = "You sent something that is not an image."
-
-                client_socket.send(response.encode('utf-8'))
-
-                client_socket.close()
-            except Exception as e:
-                print(f"Error: {e}")
+            client_socket, client_address = self.server_socket.accept()
+            print(f"Accepted connection from {client_address}")
+            
+            frame_bytes = client_socket.recv(self.buffer_size)   
+            frame = np.frombuffer(frame_bytes, dtype=np.uint8)
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            
+            self.face_detector = FaceDetector(frame)
+            image, roi = self.face_detector.detect_faces()
+            self.save_face_to_file(image)
+            
+            encoder = Encoder("test" , "local" , roi)
+            response = encoder.encode()
+            
+            print(response)
+            
+            client_socket.send(response.encode('utf-8'))
+            client_socket.close()
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG
@@ -59,3 +60,12 @@ class SimpleServer:
                 return True
 
         return False
+    
+    def save_face_to_file(self, frame):
+        if frame is not None:
+            file_path = 'face.jpg'
+            cv2.imwrite(file_path, frame)
+            print(f"Face saved to {file_path}")
+        else:
+            print("Received an invalid or empty frame, cannot save to file.")
+            self.terminate_server = True
