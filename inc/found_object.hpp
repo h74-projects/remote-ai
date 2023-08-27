@@ -9,7 +9,6 @@
 class FoundObject{
 public:
     FoundObject() = default;
-    FoundObject(time_t const &a_time, std::string const &a_source, RemoteAIROI const &a_roi);
     FoundObject(std::string const &a_data);
     FoundObject(FoundObject &a_data) = default;
     ~FoundObject() = default;
@@ -24,6 +23,7 @@ private:
     time_t m_time_taken;
     std::string m_source;
     RemoteAIROI m_roi;
+    unsigned char *m_image_data;
 };
 
 

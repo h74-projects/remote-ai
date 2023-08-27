@@ -7,10 +7,16 @@ public:
     RemoteAIROI() = default;
     ~RemoteAIROI() = default;
     RemoteAIROI(RemoteAIROI const &) = default;
-    std::pair<int,int> &operator[](int a_index);
+    int &x();
+    int &y();
+    int &w();
+    int &h();
 
 private:
-    std::vector<std::pair<int,int>> m_points;
+    int m_x;
+    int m_y;
+    int m_w;
+    int m_h;
 };
 
 
