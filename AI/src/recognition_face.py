@@ -1,9 +1,13 @@
 import cv2
 
+# add this line if cv2.data isnt found
+# export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
 class FaceDetector:
     def __init__(self, a_frame):
-        self.face_cascade = cv2.CascadeClassifier('/home/nisan/.local/lib/python3.11/site-packages/cv2/data/haarcascade_frontalface_default.xml')
+        cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+
+        self.face_cascade = cv2.CascadeClassifier(cascade_path)
         self.frame = a_frame
 
     def detect_faces(self):
