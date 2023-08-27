@@ -3,7 +3,7 @@ from src.client import ImageClient
 import cv2
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(0)
     movement_detector = MovementDetector(cap)
     movement_detected_frame = movement_detector.detect_movement()
     cap.release()
