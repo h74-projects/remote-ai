@@ -49,7 +49,6 @@ class SimpleServer:
             
             client_socket.send(response.encode('utf-8'))
             client_socket.close()
-            break
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG

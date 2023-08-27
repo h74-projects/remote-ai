@@ -19,15 +19,16 @@ class MovementDetector:
 
             for contour in contours:
                 if cv2.contourArea(contour) > 100:
-                    return frame
-            
-            # cv2.imshow('Feed', frame)
-            # key = cv2.waitKey(20)
-            # if key == ord('q'):
-            #     break
+                    cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
+                    # return frame
+
+            cv2.imshow('Feed', frame)
+            key = cv2.waitKey(20)
+            if key == ord('q'):
+                cv2.destroyAllWindows()
+                return frame
 
             self.prev_frame = current_frame
 
-        # Release the camera and destroy the OpenCV windows when done.
-        self.cap.release()
-        cv2.destroyAllWindows()
+        # self.cap.release()
+        # cv2.destroyAllWindows()
