@@ -40,7 +40,7 @@ class SimpleServer:
             
             self.face_detector = FaceDetector(frame)
             image, roi = self.face_detector.detect_faces()
-            # self.save_face_to_file(image)
+            self.save_face_to_file(image)
             
             encoder = Encoder("test" , "local" , roi)
             response = encoder.encode()
@@ -62,7 +62,7 @@ class SimpleServer:
         return False
     
     def save_face_to_file(self, frame):
-        if frame is not None:
+        if frame is not None and isinstance(frame, np.ndarray) and frame.size > 0:
             file_path = 'face.jpg'
             cv2.imwrite(file_path, frame)
             print(f"Face saved to {file_path}")

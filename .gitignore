@@ -114,3 +114,6 @@ dkms.conf
 utest
 main
 *.log
+
+# Python __pycache__ folders
+__pycache__/
