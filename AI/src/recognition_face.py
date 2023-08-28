@@ -1,28 +1,32 @@
 import cv2
 
+# add this line if cv2.data isnt found
+# export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
 class FaceDetector:
     def __init__(self, a_frame):
-        self.face_cascade = cv2.CascadeClassifier('/home/nisan/.local/lib/python3.11/site-packages/cv2/data/haarcascade_frontalface_default.xml')
+        cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+
+        self.face_cascade = cv2.CascadeClassifier(cascade_path)
         self.frame = a_frame
 
     def detect_faces(self):
-            save_face = False
             gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
             faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30))
             
             for (x, y, w, h) in faces:
-                # cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                cv2.rectangle(self.frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 face_region = gray[y:y+h, x:x+w]
-                return face_region, [(x, y, w, h)]
-                
-                # if cv2.waitKey(10) & 0xFF == ord('s'):
-                # save_face = True
 
-            # cv2.imshow('Feed', frame)
-            # if cv2.waitKey(20) & 0xFF == ord('q'):
-            #     break
+            while True:
+                cv2.imshow('Feed', self.frame)
+                key = cv2.waitKey(20)
+                if key == ord('q'):
+                    cv2.destroyAllWindows()
+                    break 
 
+            return face_region, [(x, y, w, h)]
+        
     def save_face_to_file(self, face_region):
         file_path = 'face.jpg'
         cv2.imwrite(file_path, face_region)

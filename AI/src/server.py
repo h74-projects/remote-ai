@@ -5,6 +5,7 @@ import socket
 import threading
 import cv2
 import sys
+import requests
 
 class SimpleServer:
     def __init__(self, host='localhost', port=8080):
@@ -42,14 +43,15 @@ class SimpleServer:
             image, roi = self.face_detector.detect_faces()
             self.save_face_to_file(image)
             
-            encoder = Encoder("test" , "local" , roi)
+            encoder = Encoder("face" , "nisan" , roi)
             response = encoder.encode()
             
             print(response)
             
             client_socket.send(response.encode('utf-8'))
+            server_answer = requests.post('http://3.239.199.222:3000', data=response)
+            
             client_socket.close()
-            break
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG
