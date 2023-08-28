@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 
+#download weights from https://pjreddie.com/darknet/yolo/@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@^^^^^^
 net = cv2.dnn.readNet("assets/yolov3.weights", "assets/yolov3.cfg")
+#download weights from https://pjreddie.com/darknet/yolo/@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@^^^^^^
+
 with open("assets/coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
