@@ -25,6 +25,8 @@ private:
     void set_topic_object(std::string const &a_msg, Topic &a_topic);
     bool is_topic_listened(Topic &a_topic);
     void notify_all_subscribers(Topic const &a_topic);
+    void remove_subscriber(int a_client_socket);
+
     friend class ServerTCP<RemoteAIServer>;
 
 private:

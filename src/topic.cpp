@@ -29,3 +29,8 @@ std::string &Topic::name()
 {
     return m_name;
 }
+
+std::string Topic::name() const
+{
+    return m_name;
+}

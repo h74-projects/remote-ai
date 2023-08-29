@@ -12,6 +12,7 @@ public:
     bool operator<(Topic const &a_topic) const;
     operator bool() const;
     std::string &name();
+    std::string name() const;
 
 private:
     std::string m_name;

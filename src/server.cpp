@@ -3,7 +3,7 @@
 #include "topic.hpp"
 
 RemoteAIServer::RemoteAIServer(int a_port)
-: m_server{a_port, 128, read_income, close_client, NULL, NULL, *this}
+: m_server{a_port, 128, read_income, close_client, new_client, NULL, *this}
 , m_objects{}
 , m_subscribers{}
 {
@@ -32,8 +32,16 @@ void RemoteAIServer::read_income(ServerTCP<RemoteAIServer> &_server, Client &a_c
 void RemoteAIServer::close_client(ServerTCP<RemoteAIServer> &_server, int _id, RemoteAIServer &_context)
 {
     (void)_server;
-    (void)_context;
+    _context.remove_subscriber(_id);
     std::cerr << "Client " <<_id<<" closed"<<std::endl;
+}
+
+int RemoteAIServer::new_client(ServerTCP<RemoteAIServer> &_server, SocketData _sockData, int _id, RemoteAIServer &_context)
+{
+    (void)_context;
+    (void)_sockData;
+    _server.send_message("wellcome", _id);
+    return 1;
 }
 
 bool RemoteAIServer::is_subscribe(std::string const &a_msg)
@@ -83,7 +91,20 @@ bool RemoteAIServer::is_topic_listened(Topic &a_topic)
 
 void RemoteAIServer::notify_all_subscribers(Topic const &a_topic)
 {
+    std::string msg{a_topic.name()+"|"+m_objects[a_topic].data()};
+
     for(auto &client : m_subscribers[a_topic] ){
-        m_server.send_message(m_objects[a_topic].data(),client.socket());
+        m_server.send_message(msg,client.socket());
+    }
+}
+
+void RemoteAIServer::remove_subscriber(int a_client_socket)
+{
+    for(auto &topic : m_subscribers){
+        for(std::vector<Client>::iterator itr = topic.second.begin(); itr != topic.second.end(); ++itr){
+            if(a_client_socket == itr->socket()){
+                topic.second.erase(itr);
+            }
+        }
     }
 }
