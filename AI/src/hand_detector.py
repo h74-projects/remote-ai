@@ -1,13 +1,20 @@
 import cv2
 import mediapipe as mp
+from collections import deque
 
 class HandDetector:
-    def __init__(self, static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5):
+    def __init__(self, static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5, history_length=5):
         self.hands = mp.solutions.hands.Hands(static_image_mode=static_image_mode, 
                                               max_num_hands=max_num_hands, 
                                               min_detection_confidence=min_detection_confidence, 
                                               min_tracking_confidence=min_tracking_confidence)
         self.mpDraw = mp.solutions.drawing_utils
+
+        # Deques to store recent wrist coordinates
+        self.x_history = deque(maxlen=history_length)
+        self.y_history = deque(maxlen=history_length)
+        self.x_threshold = 0.01  # You can adjust this value based on testing
+        self.y_threshold = 0.01  # You can adjust this value based on testing
 
     def find_hands(self, image):
         imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -61,3 +68,43 @@ class HandDetector:
         for finger in raised_fingers:
             cx, cy = int(finger.x * w), int(finger.y * h)
             cv2.circle(image, (cx, cy), 15, (0, 255, 0), cv2.FILLED)
+    
+    def detect_wave_direction(self, landmarks):
+        wrist_x = landmarks.landmark[0].x
+        
+        if len(self.x_history) > 1:
+            movement = abs(wrist_x - self.x_history[-1])
+
+            # Check for stationary hand
+            if movement < self.x_threshold:
+                return "Stationary"
+
+            # Check direction
+            if wrist_x > self.x_history[-1] and self.x_history[-1] > self.x_history[-2]:
+                return "Right"
+            elif wrist_x < self.x_history[-1] and self.x_history[-1] < self.x_history[-2]:
+                return "Left"
+
+        # Add current wrist_x to history
+        self.x_history.append(wrist_x)
+        return None
+    
+    def detect_vertical_movement(self, landmarks):
+        wrist_y = landmarks.landmark[0].y
+        
+        if len(self.y_history) > 1:
+            movement = abs(wrist_y - self.y_history[-1])
+
+            # Check for stationary hand
+            if movement < self.y_threshold:
+                return "Stationary"
+
+            # Check direction
+            if wrist_y > self.y_history[-1] and self.y_history[-1] > self.y_history[-2]:
+                return "Down"
+            elif wrist_y < self.y_history[-1] and self.y_history[-1] < self.y_history[-2]:
+                return "Up"
+
+        # Add current wrist_y to history
+        self.y_history.append(wrist_y)
+        return None
