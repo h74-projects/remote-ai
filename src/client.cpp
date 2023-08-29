@@ -19,7 +19,7 @@ int &Client::socket()
 
 bool Client::is_closed()
 {
-    return m_to_close;
+    return m_to_close == true;
 }
 
 void Client::close()

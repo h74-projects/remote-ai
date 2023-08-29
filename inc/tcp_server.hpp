@@ -173,13 +173,13 @@ ServerTCP_Status ServerTCP<Context>::run_server()
                                                 m_onFail(*this, new_sock, std::string{strerror(errno)}, m_context);
                                         }
                                 }
-                                (m_activity)--;
+                                --m_activity;
                                 if(m_activity <= 0){
-                                        continue;
+                                        clean_up();
+                                        ClearBuffer();
                                 }
                         }
                         ReadClientsDataIn();
-                        clean_up();
                 } else {
                         return SERVER_SELECT_ERROR;
                 }
@@ -226,7 +226,7 @@ void ServerTCP<Context>::AddClient(struct sockaddr_in _sin, int _sock)
 {
         Client client{_sock, _sin};
         m_clients.push_back(client);
-        ++(m_numberOfClients);
+        ++m_numberOfClients;
 }
 
 template <typename Context>
@@ -239,13 +239,12 @@ void ServerTCP<Context>::clean_up()
                         remove_client(client);
                 }
         }
-        ClearBuffer();  
 }
 
 template <typename Context>
 void ServerTCP<Context>::ReadClientsDataIn()
 {
-        for(auto client : m_clients){
+        for(auto &client : m_clients){
                 if(client.is_closed()){
                         continue;
                 } else {
@@ -301,6 +300,7 @@ int ServerTCP<Context>::read_incomming_data(Client &_client)
                         m_gotMessage(*this, _client, _client.socket(), m_buffer, result, m_context);
                 } 
                 else if (result == -1) {
+                        
                         if(m_onFail){
                                 m_onFail(*this, _client.socket(), std::string{strerror(errno)}, m_context);
                         }
@@ -308,7 +308,6 @@ int ServerTCP<Context>::read_incomming_data(Client &_client)
                 }
                 --m_activity;
                 if(m_activity <= 0){
-                        clean_up();
                         return 0;
                 }
                 return 1;

@@ -19,6 +19,12 @@ private:
     static void close_client(ServerTCP<RemoteAIServer> &_server,int _id, RemoteAIServer &_context);
     static int new_client(ServerTCP<RemoteAIServer> &_server,SocketData _sockData, int _id, RemoteAIServer &_context);
     static void on_fail(ServerTCP<RemoteAIServer> &_server,int _id, std::string const &_err, RemoteAIServer &_context);
+    bool is_subscribe(std::string const &a_msg);
+    bool is_publish(std::string const &a_msg);
+    Topic get_topic(std::string const &a_msg);
+    void set_topic_object(std::string const &a_msg, Topic &a_topic);
+    bool is_topic_listened(Topic &a_topic);
+    void notify_all_subscribers(Topic const &a_topic);
     friend class ServerTCP<RemoteAIServer>;
 
 private:

@@ -17,13 +17,14 @@ public:
     time_t time() const;
     std::string source() const;
     RemoteAIROI roi() const;
+    std::string &data();
 
 
 private:
     time_t m_time_taken;
     std::string m_source;
     RemoteAIROI m_roi;
-    unsigned char *m_image_data;
+    std::string m_raw;
 };
 
 

@@ -1,11 +1,21 @@
 #include "roi.hpp"
 
-std::pair<int, int> &RemoteAIROI::operator[](int a_index)
-{
-    return m_points[a_index];
-}
-
 int &RemoteAIROI::x()
 {
     return m_x;
+}
+
+int &RemoteAIROI::y()
+{
+    return m_y;
+}
+
+int &RemoteAIROI::w()
+{
+    return m_w;
+}
+
+int &RemoteAIROI::h()
+{
+    return m_h;
 }

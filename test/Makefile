@@ -14,7 +14,7 @@ CXXFLAGS += -std=c++17
 # flags for preprocessor
 CPPFLAGS = -I$(INC_PATH)/
 
-OBJECTS = $(SRC_PATH)/template.o utest.o
+OBJECTS = $(SRC_PATH)/server.o $(SRC_PATH)/roi.o $(SRC_PATH)/topic.o $(SRC_PATH)/found_object.o $(SRC_PATH)/subscriber.o $(SRC_PATH)/client.o utest.o
 
 TARGET = utest
 
@@ -32,5 +32,10 @@ clean:
 
 
 # dependencies
-template.o: $(INC_PATH)/template.hpp
-utest.o: $(INC_PATH)/template.hpp
+client.o: $(INC_PATH)/client.hpp
+subscriber.o: $(INC_PATH)/subscriber.hpp
+found_object.o: $(INC_PATH)/found_object.hpp
+topic.o: $(INC_PATH)/topic.hpp
+roi.o: $(INC_PATH)/roi.hpp
+server.o: $(INC_PATH)/server.hpp $(INC_PATH)/tcp_server.hpp
+utest.o: $(INC_PATH)/server.hpp

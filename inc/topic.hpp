@@ -5,10 +5,12 @@
 
 class Topic{
 public:
+    Topic();
     Topic(std::string const &a_name);
     ~Topic() = default;
     bool operator==(std::string const &a_name) const;
     bool operator<(Topic const &a_topic) const;
+    operator bool() const;
     std::string &name();
 
 private:
