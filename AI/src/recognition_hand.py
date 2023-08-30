@@ -41,24 +41,25 @@ class HandTracker():
         return raised_fingers
 
 
-    # cap = cv2.VideoCapture(0)
-    # tracker = HandTracker()  
+# if __name__ == "__main__":
+#     cap = cv2.VideoCapture(0)
+#     success, image = cap.read()
+#     tracker = HandTracker()  
 
-    # success, image = cap.read()
-    # image = tracker.handsFinder(image)
-    # raised_fingers = tracker.positionFinder(image)
+#     image = tracker.handsFinder(image)
+#     raised_fingers = tracker.positionFinder(image)
 
-        # Print the state of each finger and draw a circle on the tip
-        # for finger_id, is_raised in enumerate(raised_fingers, start=1):
-        #     if is_raised:
-        #         print(f"Finger {finger_id} is raised")
-        #         cx, cy = tracker.results.multi_hand_landmarks[0].landmark[(finger_id + 1)* 4].x, tracker.results.multi_hand_landmarks[0].landmark[(finger_id + 1)* 4].y
-        #         h, w, _ = image.shape
-        #         cx, cy = int(cx * w), int(cy * h)
-        #         cv2.circle(image, (cx, cy), 15, (255, 0, 255), cv2.FILLED)  # Draw a filled circle on raised finger
+#     # Print the state of each finger and draw a circle on the tip
+#     for finger_id, is_raised in enumerate(raised_fingers, start=1):
+#         if is_raised:
+#             print(f"Finger {finger_id} is raised")
+#             cx, cy = tracker.results.multi_hand_landmarks[0].landmark[(finger_id + 1)* 4].x, tracker.results.multi_hand_landmarks[0].landmark[(finger_id + 1)* 4].y
+#             h, w, _ = image.shape
+#             cx, cy = int(cx * w), int(cy * h)
+#             cv2.circle(image, (cx, cy), 15, (255, 0, 255), cv2.FILLED)  # Draw a filled circle on raised finger
 
-        # cv2.imshow("Video", image)
-        # key = cv2.waitKey(20)
-        # if key == ord('q'):
-        #     cv2.destroyAllWindows()
-        #     break
+#         cv2.imshow("Video", image)
+#         key = cv2.waitKey(20)
+#         if key == ord('q'):
+#             cv2.destroyAllWindows()
+#             break

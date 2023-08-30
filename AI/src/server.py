@@ -31,7 +31,6 @@ class SimpleServer:
         self.server_socket.close()
         
     def _server_thread(self):     
-        while True:
             client_socket, client_address = self.server_socket.accept()
             print(f"Accepted connection from {client_address}")
             
@@ -49,8 +48,7 @@ class SimpleServer:
             print(response)
             
             client_socket.send(response.encode('utf-8'))
-            server_answer = requests.post('http://3.235.42.183:3000', data=response)
-            
+            server_answer = requests.post('http://44.200.153.80:3000', data=response)
             client_socket.close()
 
     def is_image(self, data):
