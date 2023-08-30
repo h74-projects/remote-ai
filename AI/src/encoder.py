@@ -1,17 +1,17 @@
 import datetime
 
 class Encoder:
-    def __init__(self, topic, source, roi_face):
+    def __init__(self, topic, source, roi):
         self.m_time = datetime.datetime.now()
         self.m_topic = topic
         self.m_source = source
-        for (x, y, w, h) in roi_face:   
-            self.m_face = f"{x}|{y}|{w}|{h}"
+        for (x, y, w, h) in roi:   
+            self.m_roi = f"{x}|{y}|{w}|{h}"
         
         self.m_message = ''
 
     def encode(self):
-        self.m_message = f"{self.m_topic}|{self.m_time}|{self.m_source}|{self.m_face}"
+        self.m_message = f"{self.m_topic}|{self.m_time}|{self.m_source}|{self.m_roi}"
         return str(self.m_message)
     
 # if __name__ == "__main__":

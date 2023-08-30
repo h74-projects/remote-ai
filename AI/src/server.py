@@ -4,6 +4,7 @@ import numpy as np
 import socket
 import threading
 import cv2
+import struct
 import sys
 import requests
 
@@ -14,7 +15,7 @@ class SimpleServer:
         self.server_socket = None
         self.face_detector = None
         self.terminate_server = False
-        self.buffer_size = 128 * 1024
+        self.buffer_size = 1024
         
     def start(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,25 +32,50 @@ class SimpleServer:
         self.server_socket.close()
         
     def _server_thread(self):     
-            client_socket, client_address = self.server_socket.accept()
-            print(f"Accepted connection from {client_address}")
-            
-            frame_bytes = client_socket.recv(self.buffer_size)
-            frame = np.frombuffer(frame_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-            
-            self.face_detector = FaceDetector(frame)
-            image, roi = self.face_detector.detect_faces()
-            self.save_face_to_file(image)
-            
-            encoder = Encoder("@face" , "nisan" , roi)
-            response = encoder.encode()
-            
-            print(response)
-            
-            client_socket.send(response.encode('utf-8'))
-            server_answer = requests.post('http://44.200.153.80:3000', data=response)
-            client_socket.close()
+        client_socket, client_address = self.server_socket.accept()
+        print(f"Accepted connection from {client_address}")
+
+        # Receive image size
+        image_size = struct.unpack("!I", client_socket.recv(4))[0]
+        print(image_size)
+
+        # Receive image data
+        image_data = b""
+        while True:
+            chunk = client_socket.recv(image_size - len(image_data))
+            image_data += chunk
+            print(len(image_data))
+            if len(image_data) == image_size:
+                break
+        print("passed image loop")
+
+        response = "image - OK"
+        client_socket.send(response.encode('utf-8'))
+
+        label_bytes = client_socket.recv(1024)
+        print("passed label data")
+
+        # Convert image data to a NumPy array
+        image = np.frombuffer(image_data, dtype=np.uint8)
+        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+        # Convert label data to a string
+        label = label_bytes.decode("utf-8")
+        
+        print(label)
+
+        self.face_detector = FaceDetector(image)
+        image, roi = self.face_detector.detect_faces()
+        self.save_face_to_file(image)
+        
+        encoder = Encoder("@face" , "nisan" , roi)
+        response = encoder.encode()
+        
+        print(response)
+        
+        client_socket.send(response.encode('utf-8'))
+        # server_answer = requests.post('http://44.200.153.80:3000', data=response)
+        client_socket.close()
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG
