@@ -1,9 +1,13 @@
-from src.recognition_face import FaceDetector
+from src.recognition_face import *
+from src.recognition_objects import *
+from src.recognition_hand import *
+from src.recognition_facial_expression import *
 from src.encoder import Encoder
+import cv2
 import numpy as np
 import socket
 import threading
-import cv2
+import struct
 import sys
 import requests
 
@@ -14,7 +18,6 @@ class SimpleServer:
         self.server_socket = None
         self.face_detector = None
         self.terminate_server = False
-        self.buffer_size = 128 * 1024
         
     def start(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,27 +34,73 @@ class SimpleServer:
         self.server_socket.close()
         
     def _server_thread(self):     
+        client_socket, client_address = self.server_socket.accept()
+        print(f"Accepted connection from {client_address}")
+
+        # Receive image size
+        image_size = struct.unpack("!I", client_socket.recv(4))[0]
+        print(image_size)
+
+        # Receive image data
+        image_data = b""
         while True:
-            client_socket, client_address = self.server_socket.accept()
-            print(f"Accepted connection from {client_address}")
-            
-            frame_bytes = client_socket.recv(self.buffer_size)
-            frame = np.frombuffer(frame_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-            
-            self.face_detector = FaceDetector(frame)
+            chunk = client_socket.recv(image_size - len(image_data))
+            image_data += chunk
+            print(len(image_data))
+            if len(image_data) == image_size:
+                break
+        print("passed image loop")
+
+        response = "image - OK"
+        client_socket.send(response.encode('utf-8'))
+
+        label_bytes = client_socket.recv(1024)
+        print("passed label data")
+        
+        # Convert image data to a NumPy array
+        image = np.frombuffer(image_data, dtype=np.uint8)
+        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+        # Convert label data to a string
+        label = label_bytes.decode("utf-8")
+        
+        print(label)
+
+        topic, source = label.split("+")
+
+        if topic == "@face":
+            self.face_detector = FaceDetector(image)
             image, roi = self.face_detector.detect_faces()
-            self.save_face_to_file(image)
-            
-            encoder = Encoder("@face" , "nisan" , roi)
-            response = encoder.encode()
-            
-            print(response)
-            
-            client_socket.send(response.encode('utf-8'))
-            server_answer = requests.post('http://3.235.42.183:3000', data=response)
-            
-            client_socket.close()
+            # self.save_face_to_file(image)
+            #TODO : this should have the actual name of the person as the topic ie @nisan or @ron etc
+        elif topic == "@object":
+            obj_det = ObjectDetector(image)
+            object, roi = obj_det.detect_objects()
+            topic = object
+        elif topic == "@fingers":
+            tracker = HandTracker()  
+            image = tracker.handsFinder(image)
+            raised_fingers = tracker.positionFinder(image)
+            x, y, w, h = (0,0,0,0)
+            roi = [(x,y,w,h)]
+
+            for index,bool in enumerate(raised_fingers):
+                if bool:
+                    topic += str(index + 2)
+        elif topic == "@expression":
+            emotion_detector = EmotionDetector()
+            emotion, roi = emotion_detector.detect_emotions(image)
+            topic =f"@{emotion}"
+
+        encoder = Encoder(topic , source , roi)
+        response = encoder.encode()
+        
+        print(response)
+        
+        client_socket.send(response.encode('utf-8'))
+        client_socket.close()
+        
+        # server_answer = requests.post('http://44.200.153.80:3000', data=response)
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG

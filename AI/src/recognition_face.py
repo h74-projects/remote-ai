@@ -13,6 +13,7 @@ class FaceDetector:
     def detect_faces(self):
             gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
             faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30))
+            face_region = None
             
             for (x, y, w, h) in faces:
                 cv2.rectangle(self.frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
