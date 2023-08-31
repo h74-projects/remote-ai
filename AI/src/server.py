@@ -96,10 +96,8 @@ class SimpleServer:
         
         print(response)
         
-        client_socket.close()
         client_socket.send(response.encode('utf-8'))
-        self.server_socket.close()
-
+        client_socket.close()
         # server_answer = requests.post('http://44.200.153.80:3000', data=response)
 
     def is_image(self, data):
