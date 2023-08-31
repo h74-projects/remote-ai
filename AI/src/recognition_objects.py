@@ -59,13 +59,11 @@ class ObjectDetector:
 
                 # Draw the bounding box and label
                 text = f"{label} {confidence:.2f}"
-                objects += (text , (x,y,h,w)) 
+                objects = f"@{label}"
                 cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(self.frame, text, (x, y + 30), font, 2, color, 3)
 
-        self.save_object_to_file(self.frame)
-
-        return objects 
+        return objects, boxes
     
         # print(objects)
         # while True:

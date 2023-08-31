@@ -29,7 +29,7 @@ class MenuChooser:
     def __init__(self):
         self.app = None
         self.window = None
-        self.selected_number = None
+        self.selected_number = 0
 
     def handle_label_click(self, number):
         self.selected_number = number
@@ -41,7 +41,6 @@ class MenuChooser:
         self.window.setGeometry(100, 100, 800, 600)
         central_widget = QWidget()
         layout = QVBoxLayout()
-
         self.window.setWindowTitle("Remote AI")
 
         menubar = QMenuBar()
@@ -65,23 +64,20 @@ class MenuChooser:
         palette.setBrush(QPalette.Background, QBrush(gradient))
         self.window.setPalette(palette)
 
-        label1 = HoverLabel("Movement Detection", 1)
-        label2 = HoverLabel("Face Detection", 2)
-        label3 = HoverLabel("Object Detection", 3)
-        label4 = HoverLabel("Finger Detection", 4)
-        label5 = HoverLabel("Facial Expression Detection", 5)
+        label1 = HoverLabel("Face Detection", 1)
+        label2 = HoverLabel("Object Detection", 2)
+        label3 = HoverLabel("Finger Detection", 3)
+        label4 = HoverLabel("Facial Expression Detection", 4)
 
         label1.clicked.connect(self.handle_label_click)
         label2.clicked.connect(self.handle_label_click)
         label3.clicked.connect(self.handle_label_click)
         label4.clicked.connect(self.handle_label_click)
-        label5.clicked.connect(self.handle_label_click)
 
         layout.addWidget(label1)
         layout.addWidget(label2)
         layout.addWidget(label3)
         layout.addWidget(label4)
-        layout.addWidget(label5)
 
         central_widget.setLayout(layout)
         self.window.setCentralWidget(central_widget)

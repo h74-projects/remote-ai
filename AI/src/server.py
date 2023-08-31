@@ -1,9 +1,12 @@
-from src.recognition_face import FaceDetector
+from src.recognition_face import *
+from src.recognition_objects import *
+from src.recognition_hand import *
+# from src.recognition_facial_expression import *
 from src.encoder import Encoder
+import cv2
 import numpy as np
 import socket
 import threading
-import cv2
 import struct
 import sys
 import requests
@@ -15,7 +18,6 @@ class SimpleServer:
         self.server_socket = None
         self.face_detector = None
         self.terminate_server = False
-        self.buffer_size = 1024
         
     def start(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,7 +56,7 @@ class SimpleServer:
 
         label_bytes = client_socket.recv(1024)
         print("passed label data")
-
+        
         # Convert image data to a NumPy array
         image = np.frombuffer(image_data, dtype=np.uint8)
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
@@ -64,18 +66,41 @@ class SimpleServer:
         
         print(label)
 
-        self.face_detector = FaceDetector(image)
-        image, roi = self.face_detector.detect_faces()
-        self.save_face_to_file(image)
+        topic, source = label.split("+")
+
+        if topic == "@face":
+            self.face_detector = FaceDetector(image)
+            image, roi = self.face_detector.detect_faces()
+            # self.save_face_to_file(image)
+            #TODO : this should have the actual name of the person as the topic ie @nisan or @ron etc
+        elif topic == "@object":
+            obj_det = ObjectDetector(image)
+            object, roi = obj_det.detect_objects()
+            topic = object
+        elif topic == "@hand":
+            tracker = HandTracker()  
+            image = tracker.handsFinder(image)
+            raised_fingers = tracker.positionFinder(image)
+            x, y, w, h = (0,0,0,0)
+            roi = [(x,y,w,h)]
+
+            topic = "@fingers:"
+            for index,bool in enumerate(raised_fingers):
+                if bool:
+                    topic += str(index + 2)
+
+        print(topic, source)
         
-        encoder = Encoder("@face" , "nisan" , roi)
+        encoder = Encoder(topic , source , roi)
         response = encoder.encode()
         
         print(response)
         
-        client_socket.send(response.encode('utf-8'))
-        # server_answer = requests.post('http://44.200.153.80:3000', data=response)
         client_socket.close()
+        client_socket.send(response.encode('utf-8'))
+        self.server_socket.close()
+
+        # server_answer = requests.post('http://44.200.153.80:3000', data=response)
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG

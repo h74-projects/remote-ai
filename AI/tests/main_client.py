@@ -2,11 +2,7 @@ import cv2
 from src.client import *
 from src.client_UI import *
 from src.recognition_movement import *
-# from src.recognition_face import *
-# from src.recognition_objects import *
-# from src.recognition_hand import *
-# from src.recognition_facial_expression import *
-import struct
+import sys
 
 if __name__ == "__main__":
     label_chooser = MenuChooser()
@@ -15,31 +11,20 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     detector = None
     detected_frame = None
-    label = None
 
-    if chosen == 1:
-        label = "@movement"
-        detector = MovementDetector(cap)
-        detected_frame = detector.detect_movement()
-    # elif chosen == 2:
-    #     chosen = "@face"
-    #     detector = FaceDetector(cap)
-    #     detected_frame = movement_detector.detect_movement()
-    # elif chosen == 3:
-    #     chosen = "@object"
-    #     detector = ObjectDetector(cap)
-    #     detected_frame = movement_detector.detect_movement()
-    # elif chosen == 4:
-    #     chosen = "@hand"
-    #     detector = HandTracker(cap)
-    #     detected_frame = movement_detector.detect_movement()
-    # elif chosen == 5:
-        pass
-        # detector = ExpressionDetector(cap)
-        # detected_frame = movement_detector.detect_movement()
-    else:
-        pass
+    if chosen == 0:
+        exit()
+    elif chosen == 1:
+        chosen = "@face+nisan"
+    elif chosen == 2:
+        chosen = "@object+nisan"
+    elif chosen == 3:
+        chosen = "@hand+nisan"
+    elif chosen == 4:
+        chosen = "@Expression+nisan"
 
+    detector = MovementDetector(cap)
+    detected_frame = detector.detect_movement()
     cap.release()
 
     server_host = 'localhost'
@@ -51,8 +36,7 @@ if __name__ == "__main__":
 
     response = client.send_image(image_data)
     print(response)
-    
-    response = client.send_label(label)
+    response = client.send_label(chosen)
     print(response)
     
     client.close_connection()
