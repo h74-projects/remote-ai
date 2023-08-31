@@ -21,7 +21,7 @@ if __name__ == "__main__":
     elif chosen == 3:
         chosen = "@fingers+nisan"
     elif chosen == 4:
-        chosen = "@Expression+nisan"
+        chosen = "@expression+nisan"
 
     detector = MovementDetector(cap)
     detected_frame = detector.detect_movement()

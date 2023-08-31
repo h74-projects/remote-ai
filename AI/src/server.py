@@ -1,7 +1,7 @@
 from src.recognition_face import *
 from src.recognition_objects import *
 from src.recognition_hand import *
-# from src.recognition_facial_expression import *
+from src.recognition_facial_expression import *
 from src.encoder import Encoder
 import cv2
 import numpy as np
@@ -83,13 +83,15 @@ class SimpleServer:
             raised_fingers = tracker.positionFinder(image)
             x, y, w, h = (0,0,0,0)
             roi = [(x,y,w,h)]
-            
+
             for index,bool in enumerate(raised_fingers):
                 if bool:
                     topic += str(index + 2)
+        elif topic == "@expression":
+            emotion_detector = EmotionDetector()
+            emotion, roi = emotion_detector.detect_emotions(image)
+            topic =f"@{emotion}"
 
-        print(topic, source)
-        
         encoder = Encoder(topic , source , roi)
         response = encoder.encode()
         
@@ -97,6 +99,7 @@ class SimpleServer:
         
         client_socket.send(response.encode('utf-8'))
         client_socket.close()
+        
         # server_answer = requests.post('http://44.200.153.80:3000', data=response)
 
     def is_image(self, data):
