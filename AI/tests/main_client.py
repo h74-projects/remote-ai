@@ -19,7 +19,7 @@ if __name__ == "__main__":
     elif chosen == 2:
         chosen = "@object+nisan"
     elif chosen == 3:
-        chosen = "@hand+nisan"
+        chosen = "@fingers+nisan"
     elif chosen == 4:
         chosen = "@Expression+nisan"
 

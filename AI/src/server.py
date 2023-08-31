@@ -77,14 +77,13 @@ class SimpleServer:
             obj_det = ObjectDetector(image)
             object, roi = obj_det.detect_objects()
             topic = object
-        elif topic == "@hand":
+        elif topic == "@fingers":
             tracker = HandTracker()  
             image = tracker.handsFinder(image)
             raised_fingers = tracker.positionFinder(image)
             x, y, w, h = (0,0,0,0)
             roi = [(x,y,w,h)]
-
-            topic = "@fingers:"
+            
             for index,bool in enumerate(raised_fingers):
                 if bool:
                     topic += str(index + 2)
