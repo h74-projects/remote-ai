@@ -205,7 +205,6 @@ ServerTCP_Status ServerTCP<Context>::run_server()
 				if (m_activity <= 0)
 				{
 					clean_up();
-					ClearBuffer();
 				}
 			}
 			ReadClientsDataIn();
@@ -226,15 +225,16 @@ ServerTCP_Status ServerTCP<Context>::run_server()
 template <typename Context>
 ServerTCP_Status ServerTCP<Context>::send_message(std::string const &_data, int _sock)
 {
-	int sent_bytes;
-	sent_bytes = send(_sock, _data.data(), _data.size(), 0);
-	if (sent_bytes < 0)
-	{
-		if (m_onFail)
-		{
-			m_onFail(*this, _sock, std::string{strerror(errno)}, m_context);
+	int sent_bytes = -1;
+	try{
+		sent_bytes = send(_sock, _data.data(), _data.size(), 0);
+	} catch(...){
+		if (sent_bytes < 0){
+			if (m_onFail){
+				m_onFail(*this, _sock, std::string{strerror(errno)}, m_context);
+			}
+			return SERVER_SEND_FAIL;
 		}
-		return SERVER_SEND_FAIL;
 	}
 	return SERVER_SUCCESS;
 }
@@ -347,7 +347,9 @@ int ServerTCP<Context>::read_incomming_data(Client &_client)
 		}
 		else if (result > 0)
 		{
+			m_buffer[result]='\0';
 			m_gotMessage(*this, _client, _client.socket(), m_buffer, result, m_context);
+			
 		}
 		else if (result == -1)
 		{

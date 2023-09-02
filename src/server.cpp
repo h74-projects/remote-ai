@@ -3,7 +3,7 @@
 #include "topic.hpp"
 
 RemoteAIServer::RemoteAIServer(int a_port)
-: m_server{a_port, 128, read_income, close_client, new_client, NULL, *this}
+: m_server{a_port, 128, read_income, close_client, new_client, on_fail, *this}
 , m_objects{}
 , m_subscribers{}
 {
@@ -17,7 +17,7 @@ void RemoteAIServer::read_income(ServerTCP<RemoteAIServer> &_server, Client &a_c
     Topic topic_name;
     if(a_server.is_subscribe(_msg)){
         a_server.m_subscribers[a_server.get_topic(_msg)].emplace_back(_id, a_client.addr());
-        _server.send_message("200", _id);
+        _server.send_message(a_server.m_ok, _id);
         return;
     }
     else if(a_server.is_publish(_msg)){
@@ -25,7 +25,6 @@ void RemoteAIServer::read_income(ServerTCP<RemoteAIServer> &_server, Client &a_c
     }
     if(topic_name && a_server.is_topic_listened(topic_name)){
         a_server.notify_all_subscribers(topic_name);
-        _server.send_message("200", _id);
     }
 }
 
@@ -36,12 +35,19 @@ void RemoteAIServer::close_client(ServerTCP<RemoteAIServer> &_server, int _id, R
     std::cerr << "Client " <<_id<<" closed"<<std::endl;
 }
 
-int RemoteAIServer::new_client(ServerTCP<RemoteAIServer> &_server, SocketData _sockData, int _id, RemoteAIServer &_context)
+int RemoteAIServer::new_client(ServerTCP<RemoteAIServer> &_server, SocketData _sockData, int _id, RemoteAIServer &a_server)
+{
+    (void)_sockData;
+    _server.send_message(a_server.m_ok, _id);
+    return 1;
+}
+
+void RemoteAIServer::on_fail(ServerTCP<RemoteAIServer> &_server, int _id, std::string const &_err, RemoteAIServer &_context)
 {
     (void)_context;
-    (void)_sockData;
-    _server.send_message("wellcome", _id);
-    return 1;
+    (void)_server;
+    _context.remove_subscriber(_id);
+    std::cerr << _err<<std::endl;
 }
 
 bool RemoteAIServer::is_subscribe(std::string const &a_msg)

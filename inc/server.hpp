@@ -33,6 +33,7 @@ private:
     ServerTCP<RemoteAIServer> m_server;
     std::map<Topic, FoundObject> m_objects;
     std::map<Topic, std::vector<Client>> m_subscribers;
+    const std::string m_ok = "ok";
 };
 
 
