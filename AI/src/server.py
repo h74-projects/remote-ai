@@ -2,6 +2,8 @@ from src.recognition_face import *
 from src.recognition_objects import *
 from src.recognition_hand import *
 from src.recognition_facial_expression import *
+from src.recognition_thumbs import *
+
 from src.encoder import Encoder
 import cv2
 import numpy as np
@@ -17,6 +19,7 @@ class SimpleServer:
         self.port = port
         self.server_socket = None
         self.face_detector = None
+        self.ron = 'http://44.203.26.117:3000'
         self.terminate_server = False
         
     def start(self):
@@ -102,20 +105,45 @@ class SimpleServer:
                 emotion, roi = emotion_detector.detect_emotions(image)
                 topic =f"@{emotion}"
 
+            elif topic == "@robot":
+                tracker = ThumbTracker()
+                raised = 0
+                for _ in range(5):
+                    image = tracker.handsFinder(image)
+                    state = tracker.thumbsFinder(image)
+
+                x, y, w, h = (0,0,0,0)
+                roi = [(x,y,w,h)]
+                if state:
+                    if state == 1:
+                        topic = "@forward"
+                    elif state == -1:
+                        topic = "@backward"
+                    elif state == 0.5:
+                        topic = "@right"
+                    elif state == -0.5:
+                        topic = "@left"
+
+            elif topic == "@robot_view":
+                x, y, w, h = (0,0,0,0)
+                roi = [(x,y,w,h)]
+                topic = "/sub/robot_view"
+
             encoder = Encoder(topic , source , roi)
             response = encoder.encode()
             
             print(response)
             
             client_socket.send(response.encode('utf-8'))
-            
-            try:
-                server_ans = requests.post('http://44.203.26.117:3000', data=response, timeout= 1)
-            except requests.exceptions.Timeout:
-                    print("Request timed out (no response expected)")
-            except requests.exceptions.RequestException as e:
-                    print(f"An error occurred: {e}")
-
+            if topic != "/sub/robot_view":
+                try:
+                    server_ans = requests.post(self.ron, data=response, timeout= 1)
+                except requests.exceptions.Timeout:
+                        print("Request timed out (no response expected)")
+                except requests.exceptions.RequestException as e:
+                        print(f"An error occurred: {e}")
+            else:
+                self.get_robot_stream(self, response)
 
     def is_image(self, data):
         image_signatures = [b'\xFF\xD8\xFF',  # JPEG
@@ -135,3 +163,23 @@ class SimpleServer:
         else:
             print("Received an invalid or empty frame, cannot save to file.")
             self.terminate_server = True
+
+    def get_robot_stream(self, response):
+        while True:
+            
+            try:
+                server_ans = requests.post(self.ron, data=response, timeout= 1)
+            except requests.exceptions.Timeout:
+                    print("Request timed out (no response expected)")
+            except requests.exceptions.RequestException as e:
+                    print(f"An error occurred: {e}")
+
+            if server_ans.status_code == 200:
+                received_image_data = np.frombuffer(response.content, dtype=np.uint8)
+                received_image = cv2.imdecode(received_image_data, cv2.IMREAD_COLOR)
+                cv2.imshow('Received Image', received_image)
+
+            # Check for user input to exit the loop
+            key = cv2.waitKey(1)
+            if key == ord('q'):
+                break

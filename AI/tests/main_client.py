@@ -16,6 +16,8 @@ def map_chosen_to_string(chosen):
         2: "@object+nisan",
         3: "@fingers+nisan",
         4: "@expression+nisan",
+        5: "@robot+nisan",
+        6: "@robot_view+nisan"
     }
     return label_mapping.get(chosen, "@exit+nisan")
 
@@ -26,12 +28,12 @@ def main():
     server_port = 8080
     client = ImageClient(server_host, server_port)
 
-    if chosen == "@exit+nisan":
+    if chosen == "@exit+nisan" or chosen == "@robot_view+nisan":
         client = ImageClient(server_host, server_port)
         client.connect_to_server()
         response = client.send_label(chosen)
         return
-
+    
     cap = cv2.VideoCapture(0)
     detector = MovementDetector(cap)
     detected_frame = detector.detect_movement()
