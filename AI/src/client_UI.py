@@ -68,16 +68,22 @@ class MenuChooser:
         label2 = HoverLabel("Object Detection", 2)
         label3 = HoverLabel("Finger Detection", 3)
         label4 = HoverLabel("Facial Expression Detection", 4)
+        label5 = HoverLabel("Robot Control", 5)
+        label6 = HoverLabel("Robot View", 5)
 
         label1.clicked.connect(self.handle_label_click)
         label2.clicked.connect(self.handle_label_click)
         label3.clicked.connect(self.handle_label_click)
         label4.clicked.connect(self.handle_label_click)
+        label5.clicked.connect(self.handle_label_click)
+        label6.clicked.connect(self.handle_label_click)
 
         layout.addWidget(label1)
         layout.addWidget(label2)
         layout.addWidget(label3)
         layout.addWidget(label4)
+        layout.addWidget(label5)
+        layout.addWidget(label6)
 
         central_widget.setLayout(layout)
         self.window.setCentralWidget(central_widget)

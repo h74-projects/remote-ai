@@ -5,11 +5,16 @@ class ImageClient:
     def __init__(self, server_host, server_port):
         self.server_host = server_host
         self.server_port = server_port
-        self.client_socket = None
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect_to_server(self):
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.server_host, self.server_port))
+        while True:  
+            try:
+                self.client_socket.connect((self.server_host, self.server_port))
+                break
+            except OSError as e:
+                    if e.errno == 111:  
+                        self.server_port += 1
 
     def send_image(self, image_data):
         try:
