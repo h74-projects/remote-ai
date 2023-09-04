@@ -1,0 +1,20 @@
+# Client side makefile 
+
+TARGET= client.out
+CC= gcc
+CFLAGS= -ansi -g -pedantic
+#LIBS= -L/home/user/h74/Generics -lGenerics -lm
+CPATH= ../../h74/Network/ChatServerProject
+OBJS= client_test.o $(CPATH)/ClientNet.o
+
+$(TARGET): $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) #$(LIBS)
+	
+$(CPATH)/ClientNet.o: $(CPATH)/ClientNet.c $(CPATH)/ClientNet.h $(CPATH)/ADTUtils.h
+	$(CC) $(CFLAGS) -c $(CPATH)/ClientNet.c
+
+client_test.o: client_test.c $(CPATH)/ClientNet.h
+	$(CC) $(CFLAGS) -c client_test.c
+	
+clean:
+	rm -f $(TARGET) $(OBJS)
