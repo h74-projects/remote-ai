@@ -41,17 +41,14 @@ class ThumbTracker():
             base_x = Hand.landmark[thumb_base_landmark_id].x
             base_y = Hand.landmark[thumb_base_landmark_id].y
 
-            # Define thresholds for thumb-up/down and thumb-left/right detection (adjust as needed)
+
             thumb_up_down_threshold = 0.1
             thumb_left_right_threshold = 0.1
 
-            # Check for thumb-up and thumb-down
             if tip_y < base_y - thumb_up_down_threshold:
                 thumb_state = 1  # Thumb up
             elif tip_y > base_y + thumb_up_down_threshold:
                 thumb_state = -1  # Thumb down
-
-            # Check for thumb-left and thumb-right
             if tip_x < base_x - thumb_left_right_threshold:
                 thumb_state += 0.5  # Thumb left
             elif tip_x > base_x + thumb_left_right_threshold:

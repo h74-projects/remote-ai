@@ -23,7 +23,7 @@ class FaceDetector:
                     return face_region, [(x, y, w, h)]
                 
                 else:
-                    self.rotate_image(self.image, angle = 36)
+                    self.rotate_image(self.frame, angle = 36)
 
                 (x, y, w, h) = (-1,-1,-1,-1)
                 return face_region, [(x, y, w, h)]
