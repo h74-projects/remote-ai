@@ -57,8 +57,8 @@ class MenuChooser:
         layout.addWidget(title_label)
 
         gradient = QLinearGradient(0, 0, 0, self.window.height())
-        gradient.setColorAt(0, QColor(50, 100, 150))  # Start color
-        gradient.setColorAt(1, QColor(150, 185, 225))  # End color
+        gradient.setColorAt(0, QColor(50, 100, 150))  # start color light teal
+        gradient.setColorAt(1, QColor(150, 185, 225))  # end color  dark teal
 
         palette = self.window.palette()
         palette.setBrush(QPalette.Background, QBrush(gradient))
@@ -69,7 +69,7 @@ class MenuChooser:
         label3 = HoverLabel("Finger Detection", 3)
         label4 = HoverLabel("Facial Expression Detection", 4)
         label5 = HoverLabel("Robot Control", 5)
-        label6 = HoverLabel("Robot View", 5)
+        label6 = HoverLabel("Robot View", 6)
 
         label1.clicked.connect(self.handle_label_click)
         label2.clicked.connect(self.handle_label_click)

@@ -20,7 +20,7 @@ class ImageClient:
         try:
             if self.client_socket:
                 image_size = len(image_data)
-                self.client_socket.sendall(struct.pack("!I", image_size))  # Send the size of the image
+                self.client_socket.sendall(struct.pack("!I", image_size))
                 self.client_socket.sendall(image_data)
                 data = self.client_socket.recv(1024)
                 return data

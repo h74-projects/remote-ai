@@ -24,14 +24,16 @@ def map_chosen_to_string(chosen):
 def main():
     chosen = choose_label()
     chosen = map_chosen_to_string(chosen)
+    print(chosen)
     server_host = 'localhost'
     server_port = 8080
     client = ImageClient(server_host, server_port)
+    client.connect_to_server()
 
     if chosen == "@exit+nisan" or chosen == "@robot_view+nisan":
-        client = ImageClient(server_host, server_port)
-        client.connect_to_server()
         response = client.send_label(chosen)
+        print(response)
+        client.close_connection()
         return
     
     cap = cv2.VideoCapture(0)
@@ -39,7 +41,6 @@ def main():
     detected_frame = detector.detect_movement()
     cap.release()
     
-    client.connect_to_server()
     image_data = cv2.imencode('.jpg', detected_frame)[1].tobytes()
 
     response = client.send_label(chosen)
